@@ -2,18 +2,25 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
   <title>Plinko Demo Oyun - Bonus Kazan</title>
   <style>
     body {
       margin: 0; padding: 0;
-      background: url('preland.png') no-repeat center center fixed;
+      background: url('preland.png') no-repeat top center;
       background-size: cover;
       font-family: Arial, sans-serif;
       color: #fff;
-      overflow-x: hidden;
+      min-height: 100vh;
+      box-sizing: border-box;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
     }
-    #game { max-width: 340px; margin: 0 auto; padding-top: 18px;}
+    #game { 
+      max-width: 340px; 
+      margin: 0 auto; 
+      padding-top: 18px;
+      width: 96vw;
+    }
     #score { font-size: 1.2em; margin-bottom: 10px; letter-spacing: 1px;}
     #start-btn {
       width: 90%; margin: 22px auto 10px auto; display: block; font-size: 1em;
@@ -21,29 +28,54 @@
       transition: background .2s;
     }
     #start-btn:active { background: #1976d2; }
-    #board { position: relative; height: 300px; margin-bottom: 10px; background: transparent; overflow: hidden;}
-    .peg { width: 7px; height: 7px; background: #fff6; border-radius: 50%; position: absolute;}
-    .slot { width: 21px; height: 15px; background: #222d; border-radius: 7px; position: absolute; bottom: 0; text-align: center; line-height: 15px; font-weight: bold; font-size:0.82em;}
+    #board { 
+      position: relative; 
+      height: 300px; 
+      margin-bottom: 10px; 
+      background: transparent; 
+      overflow: hidden;
+      width: 100%;
+      max-width: 340px;
+      margin-left: auto; margin-right: auto;
+      box-sizing: border-box;
+    }
+    .peg { 
+      width: 7px; height: 7px; background: #fff6; border-radius: 50%; position: absolute;
+    }
+    .slot { 
+      width: calc((100% / 9) - 3px); min-width: 18px; max-width: 28px;
+      height: 15px; background: #222d; border-radius: 7px; position: absolute; bottom: 0; 
+      text-align: center; line-height: 15px; font-weight: bold; font-size:0.82em;
+    }
     .ball { width: 9px; height: 9px; background: #29b6f6; border-radius: 50%; position: absolute; box-shadow: 0 0 5px #29b6f6; z-index: 10; }
     .trail { position:absolute; border-radius:50%; pointer-events:none; opacity:0.10; z-index:2; background: radial-gradient(circle, #3cf 14%, #29b6f6 32%, transparent 90%);}
     #counter {margin-bottom:7px;}
-    #marquee, #chatbox {font-size:0.97em;background:#112d48cc;padding:5px 0 3px 0;overflow:hidden;}
-    #marquee {white-space:nowrap;}
+
     #online {padding:5px 0 2px 0;text-align:center;background:#1e314c88;font-size:0.96em;}
     #today {padding-bottom:6px;text-align:center;font-size:0.91em;opacity:.77;}
-    #faq-block {background:#15223b99;padding:13px 16px 10px 16px;border-radius:14px;margin:13px 0 0 0;}
-    #faq-block h3 {font-size:1.06em;margin:0 0 7px 0;}
-    #faq-block ul {margin:0;padding:0 0 0 16px;font-size:0.97em;}
-    #faq-block li {margin-bottom:3px;}
+    #chatbox {font-size:0.97em;background:#112d48cc;padding:5px 0 3px 0;overflow:hidden; height:32px;}
+
     #modal-bg, #exit-bg {
       display: none; position: fixed; left:0; top:0; width:100vw; height:100vh; z-index:99;
       background: rgba(0,0,0,0.63); justify-content: center; align-items: center;
     }
     #modal-content, #exit-content {
-      background: #17223b; padding: 32px 16px 22px 16px; border-radius: 18px;
-      box-shadow: 0 0 48px #0008; text-align: center; color: #fff; max-width: 88vw; margin: auto;
+      background: #17223b; 
+      padding: 22px 10px 16px 10px;
+      border-radius: 18px;
+      box-shadow: 0 0 48px #0008; 
+      text-align: center; 
+      color: #fff; 
+      max-width: 90vw; 
+      margin: auto;
       font-size: 1.13em;
       animation: popin 0.33s cubic-bezier(.62,2.5,.42,.84);
+      max-height: 96vh; 
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+    @media (max-width: 400px) {
+      #modal-content, #exit-content { padding: 12px 2vw 9px 2vw; }
     }
     @keyframes popin {
       0% {transform: scale(0.85); opacity: 0;}
@@ -51,20 +83,23 @@
       100% {transform: scale(1); opacity: 1;}
     }
     #collect-btn, #exit-btn {
-      margin-top: 18px; padding: 14px 0; border-radius: 12px; border:none;
-      width: 100%; max-width: 220px; font-size:1.07em;
-      background: #ff416c; color: #fff; font-weight: bold; box-shadow: 0 0 15px #ff416c;
-      cursor: pointer; transition: background 0.19s;
+      margin-top: 18px; 
+      padding: 14px 0; 
+      border-radius: 12px; 
+      border:none;
+      width: 100%; 
+      max-width: 220px; 
+      font-size:1.07em;
+      background: #ff416c; 
+      color: #fff; 
+      font-weight: bold; 
+      box-shadow: 0 0 15px #ff416c;
+      cursor: pointer; 
+      transition: background 0.19s;
+      margin-bottom: 6vw; /* чтобы не упиралась в системную навигацию */
     }
     #collect-btn:active, #exit-btn:active { background: #d9003c;}
     #timer {font-size:1.06em;color:#ffd24e;font-weight:bold;margin:12px 0;}
-    /* Салют */
-    #confetti {pointer-events:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:120;display:none;}
-    /* Чат */
-    #chatbox {height:32px;overflow:hidden;}
-    .chatmsg {margin-bottom:0;animation:slideup 0.8s linear;}
-    @keyframes slideup {0%{opacity:0;transform:translateY(24px);}100%{opacity:1;transform:translateY(0);}}
-    /* Монеты */
     .coin {position:fixed;top:60%;left:50%;width:30px;height:30px;z-index:120;pointer-events:none;background:url('https://cdn.pixabay.com/photo/2017/01/31/13/14/coins-2025622_1280.png') center/cover no-repeat;animation:coindrop 1.1s cubic-bezier(.62,2.5,.42,.84);}
     @keyframes coindrop {
       0%{transform:translate(-50%,-50%) scale(1.5);}
@@ -74,7 +109,6 @@
   </style>
 </head>
 <body>
-  <div id="marquee"></div>
   <div id="online"></div>
   <div id="today"></div>
   <div id="chatbox"></div>
@@ -92,7 +126,6 @@
       <div style="margin-bottom:9px;"><b>Yalnızca bugün geçerli!</b><br>Kazancını almak için hemen kaydol:</div>
       <button id="collect-btn">Kazancını Al</button>
       <div style="margin-top:16px;opacity:.83;"><small>Bunu kaçırma! Süre bitince teklif kaybolur.</small></div>
-      <div id="prize-anim"></div>
       <div id="faq-block">
         <h3>Sıkça Sorulan Sorular</h3>
         <ul>
@@ -112,10 +145,9 @@
       <button id="exit-btn">Şimdi Al</button>
     </div>
   </div>
-  <!-- Салют -->
   <canvas id="confetti"></canvas>
 <script>
-  // Турецкие имена и победы для маркета
+  // Турецкие имена и победы для чата
   const demoNames = ["Ahmet","Mehmet","Elif","Ayşe","Burak","Fatma","Emir","Yusuf","Zeynep","Mert","Deniz","Kerem","Derya","Seda","Berk","Sinem","Gizem","Umut"];
   const demoPrizes = [13,3,44.5,1.3,13,27,38,25,9,0.7,0.4,1.3,13,3,13,21,31];
   function randArr(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
@@ -123,16 +155,6 @@
     let name = randArr(demoNames), prize = randArr(demoPrizes);
     return `<b>${name}</b> <span style="color:#ffd24e;">${prize}₺</span> kazandı!`;
   }
-
-  // Бегущая строка
-  function startMarquee() {
-    let mq = document.getElementById('marquee');
-    let msg = '';
-    for(let i=0;i<8;i++) msg += randomWinMsg() + ' &nbsp;&nbsp;&nbsp;';
-    mq.innerHTML = `<marquee scrollamount="5">${msg}</marquee>`;
-  }
-  startMarquee();
-
   // Онлайн и за сегодня
   function setOnline() {
     let online = Math.floor(Math.random()*401)+100;
@@ -141,7 +163,6 @@
     document.getElementById('today').innerHTML = `<b>Bugün giriş yapanlar:</b> ${today} kişi`;
   }
   setOnline();
-
   // Чат с победами (имитация)
   function startChat() {
     const chat = document.getElementById('chatbox');
@@ -156,7 +177,6 @@
     setInterval(addMsg, 2800 + Math.random()*2000);
   }
   startChat();
-
   // Оффер и UTM
   const OFFER_URL = 'https://yoursite.com'; // <-- оффер-линк
   function getUtmParams() {
@@ -166,10 +186,6 @@
     return utms && utms.length ? '?' + utms.join('&') : '';
   }
   const utmQuery = getUtmParams();
-
-  // Сохранение статуса
-  function setFinished() { localStorage.setItem('plinko_tr_finished', 'yes'); }
-  function isFinished() { return localStorage.getItem('plinko_tr_finished') === 'yes'; }
 
   function showModal() {
     document.getElementById('modal-bg').style.display = 'flex';
@@ -181,19 +197,13 @@
   function showExitModal() { document.getElementById('exit-bg').style.display = 'flex'; }
   function hideExitModal() { document.getElementById('exit-bg').style.display = 'none'; }
 
-  // Проверка на повторный вход
   window.addEventListener('DOMContentLoaded', function() {
-    if (isFinished()) {
-      document.getElementById('game').style.display = 'none';
-      showModal();
-    } else {
-      drawPegs();
-      document.getElementById('game').style.display = '';
-      hideModal();
-    }
+    drawPegs();
+    document.getElementById('game').style.display = '';
+    hideModal();
   });
 
-  // Plinko логика
+  // Plinko logic
   const pegRows = 8;
   const pegCols = 9;
   const slots = [13,3,1.3,0.7,0.4,0.7,1.3,3,13];
@@ -323,9 +333,10 @@
   document.getElementById('start-btn').onclick = launchBall;
 
   function endGame() {
-    setFinished();
     showModal();
-    document.getElementById('game').style.display = 'none';
+    document.getElementById('game').style.display = '';
+    ballsLeft = 15; // для повторной игры
+    document.getElementById('balls').innerText = ballsLeft;
   }
 
   // Таймер 5 минут (300 сек)
@@ -356,7 +367,7 @@
     canvas.style.display = 'block';
     let ctx = canvas.getContext('2d');
     let confs = [];
-    for(let i=0;i<120;i++){
+    for(let i=0;i<90;i++){
       confs.push({
         x: Math.random()*canvas.width,
         y: Math.random()*canvas.height*0.7,
@@ -389,7 +400,7 @@
     draw();
   }
   function launchCoins(){
-    for(let i=0;i<12;i++){
+    for(let i=0;i<9;i++){
       setTimeout(()=>{
         let coin=document.createElement('div');
         coin.className='coin';
@@ -411,34 +422,14 @@
   // Exit-intent (антибэк)
   let exitShown = false;
   function showExitPopup(e){
-    if(exitShown || isFinished()) return;
+    if(exitShown) return;
     exitShown = true;
     showExitModal();
     e.preventDefault();
     return "";
   }
   window.addEventListener('mouseleave', showExitPopup);
-  window.addEventListener('blur', function(){ if(document.activeElement==window) showExitPopup({preventDefault:()=>{}}); });
 
-  // FAQ уже внутри модалки
-
-  // Нельзя прокручивать страницу при модалке
-  function lockScroll(){document.body.style.overflow='hidden';}
-  function unlockScroll(){document.body.style.overflow='';}
-  document.getElementById('modal-bg').addEventListener('mousedown',lockScroll);
-  document.getElementById('exit-bg').addEventListener('mousedown',lockScroll);
-  document.getElementById('modal-bg').addEventListener('mouseup',unlockScroll);
-  document.getElementById('exit-bg').addEventListener('mouseup',unlockScroll);
-
-  setInterval(()=>{
-    if (ballsActive < maxSimultaneousBalls && ballsLeft > 0) {
-      document.getElementById('start-btn').disabled = false;
-    }
-    if (ballsLeft < 0) {
-      ballsLeft = 0;
-      document.getElementById('balls').innerText = 0;
-    }
-  }, 120);
 </script>
 </body>
 </html>
