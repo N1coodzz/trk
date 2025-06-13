@@ -7,7 +7,7 @@
   <style>
     body {
       margin: 0; padding: 0;
-      background: url('preland.png') no-repeat top center;
+      background: url('preland.jpg') no-repeat top center;
       background-size: cover;
       font-family: Arial, sans-serif;
       color: #fff;
@@ -24,11 +24,19 @@
     #counter {font-size:1.13em;margin-bottom:7px;}
     #score { font-size: 1.22em; margin-bottom: 10px; letter-spacing: 1px;}
     #start-btn {
-      width: 90%; margin: 22px auto 10px auto; display: block; font-size: 1em;
-      padding: 12px; border: none; border-radius: 10px; background: #29b6f6; color: #222; font-weight: bold; box-shadow: 0 0 13px #29b6f6;
-      transition: background .2s;
+      width: 90%; margin: 22px auto 10px auto; display: block; font-size: 1.13em;
+      padding: 15px; border: none; border-radius: 16px;
+      background: linear-gradient(90deg, #3fd6ff 0%, #ff72c2 100%);
+      color: #222; font-weight: bold; box-shadow: 0 0 20px #4ec6fa, 0 0 0 #fff;
+      position: relative;
+      transition: background .2s, box-shadow .2s, transform .13s;
+      animation: pulsebtn 1.4s infinite alternate;
     }
-    #start-btn:active { background: #1976d2; }
+    #start-btn:active { background: #ff45a1; color: #fff; box-shadow: 0 0 30px #fff2; transform: scale(0.98);}
+    @keyframes pulsebtn {
+      0% {box-shadow: 0 0 16px #4ec6fa, 0 0 0 #fff;}
+      100% {box-shadow: 0 0 32px #ff96e5, 0 0 10px #fff8;}
+    }
     #board { 
       position: relative; 
       height: 300px; 
@@ -129,8 +137,7 @@
       <div id="faq-block">
         <h3>Sıkça Sorulan Sorular</h3>
         <ul>
-          <li>Bu demo oyundur, gerçek bakiye içermez.</li>
-          <li>Kazanç hemen kayıt sonrası otomatik aktarılır.</li>
+          <li>Kazancın kaydoldutan sonra anında hesabına geçer.</li>
           <li>Teklif yalnızca yeni kullanıcılar için geçerlidir.</li>
           <li>Güvenli, lisanslı ortaklar tarafından sunulmaktadır.</li>
         </ul>
@@ -330,11 +337,10 @@
   function endGame() {
     showModal();
     document.getElementById('game').style.display = '';
-    ballsLeft = 10; // теперь 10!
+    ballsLeft = 10;
     document.getElementById('balls').innerText = ballsLeft;
   }
 
-  // Таймер 5 минут (300 сек)
   let timerInt, timerSec = 300;
   function startTimer(){
     timerSec = 300;
@@ -354,7 +360,6 @@
     timerInt = setInterval(updateTimer,1000);
   }
 
-  // Салют и монеты
   function launchConfetti(){
     let canvas = document.getElementById('confetti');
     canvas.width = window.innerWidth;
@@ -413,7 +418,6 @@
     window.location.href = OFFER_URL + utmQuery+'&bonus=ekstra';
   };
 
-  // Exit-intent (антибэк)
   let exitShown = false;
   function showExitPopup(e){
     if(exitShown) return;
